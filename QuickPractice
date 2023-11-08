@@ -1,0 +1,107 @@
+/*QUESTION 1: Retrieve information about the products with colour values except null, red, silver/black, white 
+and list price between £75 and £750. Rename the column StandardCost to Price. Also, sort the results in 
+descending order by list price.
+*/
+
+--select * from [AdventureWorks2022].Production.Product
+
+--select * from [AdventureWorks2022].Production.Product
+--where Color is null
+
+select ProductID, Name, ProductNumber, Color, StandardCost as Price, ListPrice
+from Production.Product
+where Color in ('Red', 'Silver', 'Black', 'White')
+group by ProductID, Name, ProductNumber, Color, StandardCost, ListPrice
+having ListPrice between 75 and 750
+order by ListPrice desc
+
+
+/*QUESTION 2: Find all the male employees born between 1962 to 1970 and with hire date 
+greater than 2001 and female employees born between 1972 and 1975 and hire date between 2001 and 2002.
+*/
+
+--select * from AdventureWorks2022.HumanResources.Employee
+
+select BusinessEntityID, NationalIDNumber, JobTitle, BirthDate, Gender, HireDate
+from AdventureWorks2022.HumanResources.Employee
+where Gender = 'M' and Year(BirthDate) between 1962 and 1970
+group by BusinessEntityID, NationalIDNumber, JobTitle, BirthDate, Gender, HireDate
+having Year(HireDate) > 2001
+
+--FOR FEMALE EMPLOYEES
+
+select BusinessEntityID, NationalIDNumber, JobTitle, BirthDate, Gender, HireDate
+from AdventureWorks2022.HumanResources.Employee
+where Gender = 'F' and Year(BirthDate) between 1972 and 1975
+group by BusinessEntityID, NationalIDNumber, JobTitle, BirthDate, Gender, HireDate
+having Year(HireDate) between 2001 and 2002
+
+
+/*QUESTION 3: Create a list of 10 most expensive products that have a product number beginning with BK. 
+Include only the productID, Name and colour
+*/
+
+select top 10 ProductID, Name, Color
+from Production.Product
+where ProductNumber like 'BK%'
+
+
+/*QUESTION 4: Create a list of all contact persons, where the first 4 characters of the last name 
+are the same as the first four characters of the email address. 
+b) Also, for all contacts whose first name and the last name begin with the same characters, 
+create a new column called full name combining first name and the last name only. 
+c) Also provide the length ofthe new column full name
+*/
+
+--select *
+--from Person.EmailAddress
+
+--select *
+--from Person.Person
+
+select pp.BusinessEntityID, FirstName, LastName, EmailAddress
+from Person.Person pp
+join Person.EmailAddress pea
+on pp.BusinessEntityID = pea.BusinessEntityID
+where left(LastName, 4) = left(EmailAddress, 4)
+
+--- (4b) Also, for all contacts whose first name and the last name begin with the same characters, 
+--- create a new column called full name combining first name and the last name only. 
+
+select pp.BusinessEntityID, FirstName, LastName, EmailAddress, FirstName + ' ' + LastName as FullName
+from Person.Person pp
+join Person.EmailAddress pea
+on pp.BusinessEntityID = pea.BusinessEntityID
+where left(FirstName, 1) = left(LastName, 1)
+
+--- (4c) Also provide the length ofthe new column full name
+
+select pp.BusinessEntityID, FirstName, LastName, EmailAddress, 
+      FirstName + ' ' + LastName as FullName, len(FirstName + ' ' + LastName) as ColumnLength
+from Person.Person pp
+join Person.EmailAddress pea
+on pp.BusinessEntityID = pea.BusinessEntityID
+where left(FirstName, 1) = left(LastName, 1)
+
+
+/*QUESTION 5: Return all product subcategories that take an average of 3 days or longer to manufacture.
+*/
+
+select * from Production.ProductSubcategory
+
+select * from Production.Product
+
+
+select psc.ProductSubcategoryID, psc.Name, ProductNumber, DaysToManufacture
+from Production.ProductSubcategory psc
+join Production.Product pp
+on psc.ProductSubcategoryID = pp.ProductSubcategoryID
+group by psc.ProductSubcategoryID, psc.Name, ProductNumber, DaysToManufacture
+having Avg(DaysToManufacture) >= 3
+
+
+/*QUESTION 6: Create a list of product segmentation by defining criteria that places each item 
+in a predefined segment as follows. If price gets less than £200 then low value. If price is 
+between £201 and £750 then mid value. If between £750 and £1250 then mid to high value 
+else higher value. Filter the results only for black, silver and red color products.
+*/
