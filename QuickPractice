@@ -1,3 +1,26 @@
+--- To know the number of tables in the AdventureWorks2022 Database
+
+select COUNT(*) as NumberofTables 
+from INFORMATION_SCHEMA.TABLES
+where TABLE_TYPE = 'Base Table'
+
+
+--- To know how many rows in the AdventureWorks2022 Database
+
+
+-- Declare a variable to store the total row count
+DECLARE @TotalRowCount INT;
+
+-- Initialize the variable with the sum of rows from all tables
+SELECT @TotalRowCount = SUM(rows)
+FROM sys.partitions
+WHERE index_id < 2; -- Index_id 0 and 1 represent the heap and clustered index
+
+-- Display the total row count
+SELECT @TotalRowCount AS TotalRowCount;
+
+
+
 /*QUESTION 1: Retrieve information about the products with colour values except null, red, silver/black, white 
 and list price between £75 and £750. Rename the column StandardCost to Price. Also, sort the results in 
 descending order by list price.
